@@ -17,7 +17,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [backend, setBackend] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
 
   const checkBackend = async () => { try { await api.health(); setBackend(true); } catch { setBackend(false); } };
   useState(() => { void checkBackend(); });
@@ -30,7 +29,6 @@ export default function Login() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 0) {
         setError('Backend unreachable at http://127.0.0.1:8000. Start FastAPI first, or continue in demo preview mode.');
-        setDemoMode(true);
       } else setError(err instanceof Error ? err.message : 'Sign-in failed.');
     } finally { setBusy(false); }
   };
