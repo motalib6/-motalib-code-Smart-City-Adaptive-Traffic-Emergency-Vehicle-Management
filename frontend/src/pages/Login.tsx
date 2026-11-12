@@ -68,11 +68,11 @@ export default function Login() {
             {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> : <ShieldCheck className="h-5 w-5" aria-hidden />}
             {busy ? 'Signing in…' : 'Sign in securely'}
           </button>
-          {demoMode && (
-            <button type="button" onClick={enterDemo} className="mt-3 min-h-[48px] w-full rounded-lg border border-line px-4 font-semibold text-slate2 hover:text-white">
-              Continue in demo preview (DEMO DATA)
-            </button>
-          )}
+          {/* Always available: skip sign-in and explore with labelled demo data.
+              Live simulation / emergency actions still need a real login. */}
+          <button type="button" onClick={enterDemo} className="mt-3 min-h-[48px] w-full rounded-lg border border-line px-4 font-semibold text-slate2 hover:text-white">
+            Skip sign-in — continue in demo preview (DEMO DATA)
+          </button>
           <p className="mt-4 text-center text-xs text-slate2">Passwords are Argon2-hashed server-side. Demo accounts are seeded by the backend; ask an admin for credentials.</p>
         </form>
       </div>
