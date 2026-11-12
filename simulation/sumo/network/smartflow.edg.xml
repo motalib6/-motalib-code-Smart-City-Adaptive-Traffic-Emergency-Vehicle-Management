@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SMARTFLOW ODISHA — SUMO edges: 2 lanes per edge, 50 km/h (13.89 m/s).
+     Edge id = "<from>_<to>". Incoming edge to junction J from approach A is
+     "<A-node>_J" — see backend/app/simulation/sumo_engine.py INCOMING_EDGES. -->
+<edges xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+  <!-- Top row (west-east) -->
+  <edge id="W1_J1" from="W1" to="J1" numLanes="2" speed="13.89"/>
+  <edge id="J1_J2" from="J1" to="J2" numLanes="2" speed="13.89"/>
+  <edge id="J2_E2" from="J2" to="E2" numLanes="2" speed="13.89"/>
+  <edge id="E2_J2" from="E2" to="J2" numLanes="2" speed="13.89"/>
+  <edge id="J2_J1" from="J2" to="J1" numLanes="2" speed="13.89"/>
+  <edge id="J1_W1" from="J1" to="W1" numLanes="2" speed="13.89"/>
+  <!-- Bottom row (west-east) -->
+  <edge id="W3_J3" from="W3" to="J3" numLanes="2" speed="13.89"/>
+  <edge id="J3_J4" from="J3" to="J4" numLanes="2" speed="13.89"/>
+  <edge id="J4_E4" from="J4" to="E4" numLanes="2" speed="13.89"/>
+  <edge id="E4_J4" from="E4" to="J4" numLanes="2" speed="13.89"/>
+  <edge id="J4_J3" from="J4" to="J3" numLanes="2" speed="13.89"/>
+  <edge id="J3_W3" from="J3" to="W3" numLanes="2" speed="13.89"/>
+  <!-- Left column (north-south) -->
+  <edge id="N1_J1" from="N1" to="J1" numLanes="2" speed="13.89"/>
+  <edge id="J1_J3" from="J1" to="J3" numLanes="2" speed="13.89"/>
+  <edge id="J3_S3" from="J3" to="S3" numLanes="2" speed="13.89"/>
+  <edge id="S3_J3" from="S3" to="J3" numLanes="2" speed="13.89"/>
+  <edge id="J3_J1" from="J3" to="J1" numLanes="2" speed="13.89"/>
+  <edge id="J1_N1" from="J1" to="N1" numLanes="2" speed="13.89"/>
+  <!-- Right column (north-south) -->
+  <edge id="N2_J2" from="N2" to="J2" numLanes="2" speed="13.89"/>
+  <edge id="J2_J4" from="J2" to="J4" numLanes="2" speed="13.89"/>
+  <edge id="J4_S4" from="J4" to="S4" numLanes="2" speed="13.89"/>
+  <edge id="S4_J4" from="S4" to="J4" numLanes="2" speed="13.89"/>
+  <edge id="J4_J2" from="J4" to="J2" numLanes="2" speed="13.89"/>
+  <edge id="J2_N2" from="J2" to="N2" numLanes="2" speed="13.89"/>
+</edges>

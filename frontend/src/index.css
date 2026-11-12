@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body { background: #0B1220; color: #F1F5F9; font-family: Inter, system-ui, sans-serif; }
+* :focus-visible { outline: 2px solid #15C6B3; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+@keyframes drive-x { from { transform: translateX(-8%); } to { transform: translateX(108%); } }
+@keyframes drive-y { from { transform: translateY(-8%); } to { transform: translateY(108%); } }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.anim-drive-x { animation: drive-x 9s linear infinite; }
+.anim-drive-y { animation: drive-y 11s linear infinite; }
+.anim-pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #1E2C47; border-radius: 3px; }

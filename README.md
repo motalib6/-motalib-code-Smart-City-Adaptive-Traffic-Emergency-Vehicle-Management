@@ -1,0 +1,67 @@
+# SMARTFLOW ODISHA — Intelligent Traffic & Emergency Management
+
+GEC HACKATHON 2026 — Problem Statement 03. Adaptive traffic signals from
+traffic density + safe emergency-vehicle priority + connected junctions.
+
+## What it is
+
+- **Frontend** — React 19 + TypeScript + Vite + Tailwind, 9 routes, 8 screens
+  (Login, Command Dashboard, Live Traffic Network J1–J4, AI Camera Monitoring,
+  Adaptive Junction Control, Emergency, Analytics, Events, Admin).
+  Design: dark navy `#0B1220`, teal `#15C6B3`, cyan `#38BDF8`, Inter, Lucide icons.
+- **Backend** — Python FastAPI + SQLModel + SQLite, JWT (Argon2) auth with
+  ADMIN / OPERATOR / VIEWER roles, REST under `/api`, WebSocket `/ws/live`.
+- **Adaptive engine** — density `D = 0.5·queue + 0.3·count + 0.2·wait`,
+  green `G = clip(Gmin + k·D, Gmin, Gmax)` with starvation prevention.
+- **Safety** — conflict matrix (NS vs EW never green together) + state machine
+  `GREEN_NS → YELLOW_NS → ALL_RED → GREEN_EW → YELLOW_EW → ALL_RED → GREEN_NS`.
+  Yellow / all-red are never skipped, including for emergencies.
+- **Emergency** — route validation, simulated GPS (labelled SIMULATED GPS in
+  every response), safe priority walk, next-junction preparation, event log.
+- **Vision** — lazy YOLOv8n (COCO car / motorcycle / bus / truck only — no fake
+  ambulance class). Needs `opencv-python` + `ultralytics` installed; without
+  them the endpoints report `available: false`.
+- **Simulation** — `simulation/sumo/` has a real 2×2 SUMO network (J1–J4),
+  routes and config + a TraCI `SumoEngine`. A deterministic seeded
+  `SimulatedEngine` implements the same interface for machines without SUMO.
+
+## Honest status (verified 2026-11-12)
+
+| Check | Result |
+|---|---|
+| Backend `pytest -q` | **25 passed** |
+| Frontend `npm run build` | **PASS** |
+| Live link test (this VM) | login, sim start (rush), dashboard 119 vehicles / 4 junctions, emergency `PRIORITY_GRANTED` via YELLOW → ALL_RED → GREEN, traffic inject, events — all OK |
+| SUMO | **NOT installed in this VM** — engine reports `sumo_available: false`, SUMO start returns 503. Network XML files are authored, **never run through netconvert**. See `docs/SUMO_LATER.md`. |
+| YOLOv8 | `ultralytics`/`opencv-python` not installed here — vision reports unavailable, no fake detections. |
+| Fixed vs adaptive | No experiment runs yet — `/api/analytics/comparison` returns `planned`, no invented % improvements. |
+
+## Run it
+
+```bash
+# Backend (terminal 1)
+cd backend
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python -m app.seed          # admin: admin@smartflow.local / ChangeMe123! — change after first login
+.venv/bin/uvicorn app.main:app --reload --port 8000   # docs: http://127.0.0.1:8000/docs
+
+# Frontend (terminal 2)
+cd frontend
+npm install
+npm run dev                            # http://localhost:5173
+```
+
+SUMO (on Windows, after installing Eclipse SUMO):
+
+```bash
+python simulation/sumo/build_network.py
+sumo-gui -c simulation/sumo/config/smartflow.sumocfg
+```
+
+## Docs
+
+- `docs/STITCH_PROMPTS.md` — Google Stitch Prompt 01 + 02 (paste-ready; Stitch needs the user's own Google sign-in)
+- `docs/SUMO_LATER.md` — deferred SUMO verification + reminder
+- `docs/FINAL_QA_REPORT.md` — test evidence
+- `frontend/DESIGN.md` — design tokens
+- `backend/README.md` — API contract

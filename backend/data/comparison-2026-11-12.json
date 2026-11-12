@@ -1,0 +1,30 @@
+{
+  "fixed": {
+    "mode": "fixed",
+    "scenario": "unbalanced",
+    "seed": 42,
+    "duration_ticks": 120,
+    "mean_wait_s": 19.23,
+    "mean_queue": 18.01,
+    "throughput": 1729,
+    "max_queue": 117,
+    "total_arrived": 2080,
+    "engine": "simulated (queue model on identical arrival stream; NOT SUMO)"
+  },
+  "adaptive": {
+    "mode": "adaptive",
+    "scenario": "unbalanced",
+    "seed": 42,
+    "duration_ticks": 120,
+    "mean_wait_s": 23.44,
+    "mean_queue": 19.22,
+    "throughput": 1655,
+    "max_queue": 75,
+    "total_arrived": 2080,
+    "engine": "simulated (queue model on identical arrival stream; NOT SUMO)"
+  },
+  "run_ids": {
+    "adaptive": 2,
+    "fixed": 1
+  }
+}

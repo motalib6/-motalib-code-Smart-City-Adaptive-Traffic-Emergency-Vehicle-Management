@@ -1,0 +1,25 @@
+# SMARTFLOW ODISHA — backend requirements
+# Core stack (Python 3.12). Install: pip install -r requirements.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlmodel>=0.0.22
+pydantic-settings>=2.6
+python-multipart>=0.0.9
+PyJWT>=2.9
+pwdlib[argon2]>=0.2
+httpx>=0.27
+pytest>=8.3
+
+# --- Computer vision (YOLOv8) — verified working 2026-11-12 ---
+# The vision module lazy-imports these and reports `available: false` when absent.
+# Verified installed in backend/.venv on 2026-11-12 (torch 2.15.0 comes in
+# transitively via ultralytics; full install is ~3 GB incl. CUDA wheels).
+# NOTE: pip's default TMPDIR (/tmp, tmpfs 512 MB) is too small for the torch
+# wheel (539 MB) — install with TMPDIR pointed at a large disk, e.g.:
+#   TMPDIR=$HOME/workspace/.pip-tmp pip install --no-cache-dir -r requirements.txt
+opencv-python-headless>=5.0
+ultralytics>=8.4
+
+# --- Optional: SUMO / TraCI — provided by the SUMO installation, not pip ---
+# traci and sumolib ship with Eclipse SUMO. The SumoEngine lazy-imports them and
+# reports `available: false` when SUMO is not installed (this VM: not installed).

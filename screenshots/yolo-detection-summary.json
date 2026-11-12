@@ -1,0 +1,31 @@
+{
+  "video": "/home/hatch/workspace/smartflow-odisha/backend/data/uploads/traffic-intersection-pexels-1393755.mp4",
+  "source_url": "https://www.pexels.com/video/traffic-at-urban-intersection-on-sunny-day-34494565/",
+  "source_file": "https://videos.pexels.com/video-files/1393755/1393755-sd_640_360_30fps.mp4",
+  "licence": "Pexels free to use",
+  "model": "yolov8n.pt (COCO; vehicle classes car/motorcycle/bus/truck only \u2014 no ambulance class)",
+  "frames_in_video": 990,
+  "frames_sampled": 20,
+  "sample_stride": 15,
+  "total_detections": 62,
+  "class_counts": {
+    "truck": 15,
+    "car": 47
+  },
+  "lane_counts": {
+    "unknown": {
+      "truck": 14,
+      "car": 36
+    },
+    "E": {
+      "car": 2
+    },
+    "S": {
+      "car": 9,
+      "truck": 1
+    }
+  },
+  "mean_confidence": 0.591,
+  "annotated_frame": "screenshots/yolo-detection-frame.jpg",
+  "note": "Counts are summed over sampled frames (a vehicle may be counted in more than one sampled frame); they prove detection works, not a unique-vehicle census."
+}

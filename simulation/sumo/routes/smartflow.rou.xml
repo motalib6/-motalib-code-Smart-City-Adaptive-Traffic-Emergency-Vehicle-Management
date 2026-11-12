@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SMARTFLOW ODISHA — SUMO routes: car / motorcycle / bus / truck / ambulance.
+     Flows are per-hour rates; scale them per scenario in the backend
+     (normal / medium / rush / heavy / unbalanced / emergency). -->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+  <vType id="car"        accel="2.6" decel="4.5" sigma="0.5" length="4.5" maxSpeed="13.89" vClass="passenger"/>
+  <vType id="motorcycle" accel="3.0" decel="5.0" sigma="0.5" length="2.2" maxSpeed="13.89" vClass="motorcycle"/>
+  <vType id="bus"        accel="1.5" decel="3.5" sigma="0.5" length="12.0" maxSpeed="11.11" vClass="bus"/>
+  <vType id="truck"      accel="1.2" decel="3.0" sigma="0.5" length="8.0"  maxSpeed="11.11" vClass="truck"/>
+  <vType id="ambulance"  accel="3.5" decel="6.0" sigma="0.0" length="6.0"  maxSpeed="22.22" vClass="emergency" guiShape="emergency"/>
+
+  <!-- Through routes -->
+  <route id="r_we_top"    edges="W1_J1 J1_J2 J2_E2"/>
+  <route id="r_ew_top"    edges="E2_J2 J2_J1 J1_W1"/>
+  <route id="r_we_bottom" edges="W3_J3 J3_J4 J4_E4"/>
+  <route id="r_ew_bottom" edges="E4_J4 J4_J3 J3_W3"/>
+  <route id="r_ns_left"   edges="N1_J1 J1_J3 J3_S3"/>
+  <route id="r_sn_left"   edges="S3_J3 J3_J1 J1_N1"/>
+  <route id="r_ns_right"  edges="N2_J2 J2_J4 J4_S4"/>
+  <route id="r_sn_right"  edges="S4_J4 J4_J2 J2_N2"/>
+  <!-- Turning routes via J1-J2-J4 (emergency corridor) -->
+  <route id="r_amb_j1_j2_j4" edges="W1_J1 J1_J2 J2_J4 J4_E4"/>
+  <route id="r_turn_j1_j4"   edges="N1_J1 J1_J2 J2_J4 J4_S4"/>
+
+  <!-- Normal-scenario flows (veh/h) -->
+  <flow id="f_car_we_top"    type="car"        route="r_we_top"    begin="0" end="3600" vehsPerHour="300"/>
+  <flow id="f_car_ew_top"    type="car"        route="r_ew_top"    begin="0" end="3600" vehsPerHour="280"/>
+  <flow id="f_car_we_bottom" type="car"        route="r_we_bottom" begin="0" end="3600" vehsPerHour="260"/>
+  <flow id="f_car_ns_left"   type="car"        route="r_ns_left"   begin="0" end="3600" vehsPerHour="240"/>
+  <flow id="f_car_ns_right"  type="car"        route="r_ns_right"  begin="0" end="3600" vehsPerHour="220"/>
+  <flow id="f_bus_we_top"    type="bus"        route="r_we_top"    begin="0" end="3600" vehsPerHour="30"/>
+  <flow id="f_truck_ns_left" type="truck"      route="r_ns_left"   begin="0" end="3600" vehsPerHour="20"/>
+  <flow id="f_moto_ew_top"   type="motorcycle" route="r_ew_top"    begin="0" end="3600" vehsPerHour="120"/>
+
+  <!-- Ambulance: spawned on demand by the emergency module (TraCI addVehicle),
+       not as a continuous flow. Kept here as a single scheduled vehicle for
+       the emergency-scenario demo. -->
+  <vehicle id="amb-demo-1" type="ambulance" route="r_amb_j1_j2_j4" depart="120"/>
+</routes>

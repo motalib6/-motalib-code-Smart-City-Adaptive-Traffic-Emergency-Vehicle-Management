@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SMARTFLOW ODISHA — SUMO nodes: 2x2 junction grid J1-J4 + 8 entry/exit nodes.
+     NOTE: authored, NOT verified — SUMO is not installed in this VM, so
+     netconvert has not been run here. Validate on a SUMO machine with
+     simulation/sumo/build_network.py before claiming the network loads. -->
+<nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+  <!-- Junctions (traffic lights) -->
+  <node id="J1" x="0.0"    y="400.0" type="traffic_light"/>
+  <node id="J2" x="400.0"  y="400.0" type="traffic_light"/>
+  <node id="J3" x="0.0"    y="0.0"   type="traffic_light"/>
+  <node id="J4" x="400.0"  y="0.0"   type="traffic_light"/>
+  <!-- Boundary entry/exit nodes -->
+  <node id="N1" x="0.0"    y="800.0" type="priority"/>
+  <node id="N2" x="400.0"  y="800.0" type="priority"/>
+  <node id="S3" x="0.0"    y="-400.0" type="priority"/>
+  <node id="S4" x="400.0"  y="-400.0" type="priority"/>
+  <node id="W1" x="-400.0" y="400.0" type="priority"/>
+  <node id="W3" x="-400.0" y="0.0"   type="priority"/>
+  <node id="E2" x="800.0"  y="400.0" type="priority"/>
+  <node id="E4" x="800.0"  y="0.0"   type="priority"/>
+</nodes>
