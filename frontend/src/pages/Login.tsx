@@ -9,7 +9,9 @@ import ConnectionIndicator from '../components/ConnectionIndicator';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState('admin');
+  // Default must be the seeded admin EMAIL — the backend looks users up by
+  // email, so plain "admin" always fails with "Invalid credentials".
+  const [username, setUsername] = useState('admin@smartflow.local');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('admin');
   const [error, setError] = useState('');
@@ -50,7 +52,7 @@ export default function Login() {
           <div className="mb-4 flex justify-center"><ConnectionIndicator ws="disconnected" backend={backend} /></div>
           <label className="mb-1 block text-sm font-medium text-white" htmlFor="username">Username</label>
           <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoComplete="username"
-            className="mb-4 min-h-[44px] w-full rounded-lg border border-line bg-panel2 px-3 text-white placeholder:text-slate2" placeholder="admin" />
+            className="mb-4 min-h-[44px] w-full rounded-lg border border-line bg-panel2 px-3 text-white placeholder:text-slate2" placeholder="admin@smartflow.local" />
           <label className="mb-1 block text-sm font-medium text-white" htmlFor="password">Password</label>
           <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password"
             className="mb-4 min-h-[44px] w-full rounded-lg border border-line bg-panel2 px-3 text-white placeholder:text-slate2" placeholder="••••••••" />
