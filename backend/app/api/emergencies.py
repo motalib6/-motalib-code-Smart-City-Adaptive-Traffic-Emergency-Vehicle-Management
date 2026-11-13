@@ -96,6 +96,20 @@ def create(
         "gps_source": "SIMULATED GPS — not a real ambulance feed",
         "safe_transition_steps": steps,
     }
+    # If SUMO engine is running, insert real ambulance into SUMO simulation
+    if STATE.running and STATE.engine_source == "sumo" and hasattr(STATE.engine, "emergency_manager"):
+        try:
+            if hasattr(STATE.engine, "_traci") and STATE.engine._traci is not None:
+                STATE.engine.emergency_manager.insert_ambulance_in_sumo(
+                    traci_module=STATE.engine._traci,
+                    emergency_id=emergency.id,
+                    ambulance_id=body.ambulance_id,
+                    route_junctions=route,
+                    speed_kmh=body.speed_kmh,
+                )
+        except Exception as e:
+            logger.warning(f"Could not insert ambulance in SUMO: {e}")
+
     return {"id": emergency.id, "ambulance_id": body.ambulance_id, "route": route,
             "status": emergency.status, "next_junction": nxt, "eta_s": eta,
             "safe_transition_steps": steps, "gps_source": "SIMULATED GPS"}

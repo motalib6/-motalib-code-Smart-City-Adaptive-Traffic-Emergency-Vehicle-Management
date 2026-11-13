@@ -23,7 +23,7 @@ def status(user: User = Depends(get_current_user)):
 
 
 @router.post("/start")
-def start(
+async def start(
     body: SimulationStartRequest,
     session: Session = Depends(get_session),
     user: User = Depends(require_role("ADMIN", "OPERATOR")),
@@ -32,16 +32,20 @@ def start(
         ok, why = sumo_available()
         if not ok:
             raise HTTPException(status_code=503, detail=f"SUMO unavailable: {why}")
-        STATE.engine = SumoEngine()
-        STATE.engine_source = "sumo"
-    else:
-        from app.simulation.simulated_engine import SimulatedEngine
-
-        if STATE.engine_source != "simulated":
-            STATE.engine = SimulatedEngine()
-        STATE.engine_source = "simulated"
     try:
-        result = STATE.engine.start(body.scenario)
+        if hasattr(STATE, "simulation_manager") and STATE.simulation_manager:
+            result = await STATE.simulation_manager.start(scenario=body.scenario, engine=body.engine)
+            STATE.engine = STATE.simulation_manager.engine
+            STATE.engine_source = STATE.simulation_manager.engine.source
+        else:
+            if body.engine == "sumo":
+                STATE.engine = SumoEngine()
+                STATE.engine_source = "sumo"
+            else:
+                from app.simulation.simulated_engine import SimulatedEngine
+                STATE.engine = SimulatedEngine()
+                STATE.engine_source = "simulated"
+            result = STATE.engine.start(body.scenario)
     except (ValueError, RuntimeError) as e:
         raise HTTPException(status_code=422, detail=str(e))
     STATE.running = True
@@ -52,16 +56,37 @@ def start(
 
 
 @router.post("/pause")
-def pause(session: Session = Depends(get_session), user: User = Depends(require_role("ADMIN", "OPERATOR"))):
-    STATE.engine.pause()
+async def pause(session: Session = Depends(get_session), user: User = Depends(require_role("ADMIN", "OPERATOR"))):
+    if hasattr(STATE, "simulation_manager") and STATE.simulation_manager:
+        result = await STATE.simulation_manager.pause()
+    else:
+        result = STATE.engine.pause() if STATE.engine else {}
     STATE.running = False
     log_event(session, "SIMULATION_PAUSED", "simulation paused")
     return {"status": "paused", **STATE.engine.status()}
 
 
+@router.post("/resume")
+async def resume(session: Session = Depends(get_session), user: User = Depends(require_role("ADMIN", "OPERATOR"))):
+    if hasattr(STATE, "simulation_manager") and STATE.simulation_manager:
+        result = await STATE.simulation_manager.resume()
+    else:
+        if STATE.engine:
+            STATE.engine.running = True
+            result = STATE.engine.status()
+        else:
+            result = {}
+    STATE.running = True
+    log_event(session, "SIMULATION_RESUMED", "simulation resumed")
+    return {"status": "resumed", **result}
+
+
 @router.post("/reset")
-def reset(session: Session = Depends(get_session), user: User = Depends(require_role("ADMIN", "OPERATOR"))):
-    STATE.engine.reset()
+async def reset(session: Session = Depends(get_session), user: User = Depends(require_role("ADMIN", "OPERATOR"))):
+    if hasattr(STATE, "simulation_manager") and STATE.simulation_manager:
+        result = await STATE.simulation_manager.reset()
+    else:
+        result = STATE.engine.reset() if STATE.engine else {}
     STATE.running = False
     STATE.tick = 0
     STATE.emergency_active = None
@@ -70,13 +95,16 @@ def reset(session: Session = Depends(get_session), user: User = Depends(require_
 
 
 @router.post("/scenario")
-def scenario(
+async def scenario(
     body: ScenarioRequest,
     session: Session = Depends(get_session),
     user: User = Depends(require_role("ADMIN", "OPERATOR")),
 ):
     try:
-        result = STATE.engine.set_scenario(body.scenario)
+        if hasattr(STATE, "simulation_manager") and STATE.simulation_manager:
+            result = await STATE.simulation_manager.set_scenario(body.scenario)
+        else:
+            result = STATE.engine.set_scenario(body.scenario)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     STATE.settings["scenario"] = body.scenario

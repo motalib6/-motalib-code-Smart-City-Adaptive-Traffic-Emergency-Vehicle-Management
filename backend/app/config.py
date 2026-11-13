@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     w_queue: float = 0.5
     w_count: float = 0.3
     w_wait: float = 0.2
+    # SUMO environment configuration
+    sumo_home: str = r"C:\Program Files (x86)\SUMO"
+    sumo_binary: str = r"C:\Program Files (x86)\SUMO\bin\sumo.exe"
+    sumo_gui_binary: str = r"C:\Program Files (x86)\SUMO\bin\sumo-gui.exe"
+    sumo_config: str = "simulation/sumo/config/smartflow.sumocfg"
+    simulation_mode: str = "sumo"
+    sumo_gui_enabled: bool = False
 
     model_config = {"env_prefix": "SMARTFLOW_", "extra": "ignore"}
 

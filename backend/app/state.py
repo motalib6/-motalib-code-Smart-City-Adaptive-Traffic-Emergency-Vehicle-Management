@@ -31,6 +31,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 class AppState:
     def __init__(self) -> None:
         self.engine = None  # SimulationEngine (set in main lifespan)
+        self.simulation_manager = None  # SimulationManager
         self.engine_source: str = "simulated"
         self.running: bool = False
         self.tick: int = 0

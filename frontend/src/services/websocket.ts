@@ -1,7 +1,7 @@
 
 import type { LiveEvent } from '../types';
 
-const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://127.0.0.1:8000/ws/live';
+const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://127.0.0.1:8000/ws/telemetry';
 
 export type WsStatus = 'connected' | 'connecting' | 'disconnected';
 export type WsHandler = (ev: LiveEvent) => void;
@@ -14,6 +14,7 @@ export class LiveSocket {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private closed = false;
   private attempt = 0;
+  private lastMsgHash = '';
   status: WsStatus = 'disconnected';
 
   connect() {
@@ -26,7 +27,12 @@ export class LiveSocket {
     this.ws = ws;
     ws.onopen = () => { this.attempt = 0; this.setStatus('connected'); };
     ws.onmessage = (m) => {
-      try { const ev = JSON.parse(m.data) as LiveEvent; this.handlers.forEach((h) => h(ev)); } catch { /* ignore malformed frames */ }
+      try {
+        if (m.data === this.lastMsgHash) return; // duplicate suppression
+        this.lastMsgHash = m.data;
+        const ev = JSON.parse(m.data) as LiveEvent;
+        this.handlers.forEach((h) => h(ev));
+      } catch { /* ignore malformed frames */ }
     };
     ws.onclose = () => { this.setStatus('disconnected'); if (!this.closed) this.scheduleReconnect(); };
     ws.onerror = () => { try { ws.close(); } catch { /* noop */ } };

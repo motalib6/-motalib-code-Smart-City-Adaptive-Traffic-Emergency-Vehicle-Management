@@ -1,5 +1,5 @@
 
-import type { AdminSettings, AppEvent, AuthResponse, DashboardSummary, Emergency, ExperimentRun, Junction, User } from '../types';
+import type { AdminSettings, AppEvent, DashboardSummary, Emergency, ExperimentRun, Junction, User } from '../types';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:8000';
 export const API_BASE = BASE.replace(/\/$/, '');
@@ -35,16 +35,113 @@ export const api = {
   health: () => req<{ status: string; sumo_available?: boolean; mode?: string }>('/api/health'),
   // Backend LoginRequest expects { email, password } — the login form's
   // username field holds the user's email address.
-  login: (username: string, password: string) =>
-    req<AuthResponse>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: username, password }) }),
+  login: async (username: string, password: string) => {
+    const res = await req<{ access_token: string; token_type: string; role: string; email: string; user?: User }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: username, password }),
+    });
+    const userObj: User = res.user ?? {
+      id: 1,
+      username: res.email,
+      role: (res.role?.toLowerCase() as any) ?? 'admin',
+    };
+    return {
+      access_token: res.access_token,
+      token_type: res.token_type,
+      user: userObj,
+    };
+  },
   me: () => req<User>('/api/auth/me'),
-  dashboard: () => req<DashboardSummary>('/api/dashboard/summary'),
-  junctions: () => req<Junction[]>('/api/junctions'),
+  dashboard: async () => {
+    const raw = await req<any>('/api/dashboard/summary');
+    if (raw && 'active_junctions' in raw) {
+      // Map snake_case backend keys to frontend DashboardSummary interface
+      const totalVeh = raw.total_vehicles ?? 0;
+      const avgWait = raw.avg_wait_s ?? 0;
+      return {
+        totalVehicles: totalVeh,
+        activeIntersections: raw.active_junctions ?? 4,
+        avgWaitSec: avgWait,
+        congestion: totalVeh > 30 ? 'high' : totalVeh > 10 ? 'moderate' : 'low',
+        activeEmergencies: raw.active_emergencies ?? 0,
+        throughputPerMin: Math.max(0, Math.round(totalVeh * 1.5)),
+        mode: (raw.source === 'sumo' ? 'sumo' : 'yolo') as any,
+        sumoRunning: !!raw.simulation_running,
+      } as DashboardSummary;
+    }
+    return raw as DashboardSummary;
+  },
+  junctions: async () => {
+    const raw = await req<any[]>('/api/junctions');
+    if (Array.isArray(raw)) {
+      return raw.map((j) => {
+        const live = j.live ?? {};
+        const counts = live.counts ?? { N: 0, S: 0, E: 0, W: 0 };
+        const queues = live.queues ?? { N: 0, S: 0, E: 0, W: 0 };
+        const approaches = (['N', 'S', 'E', 'W'] as const).map((app) => ({
+          approach: app,
+          vehicles: counts[app] ?? 0,
+          queue: queues[app] ?? 0,
+          avgWaitSec: live.avg_wait_s ?? 0,
+          demand: Math.round(((counts[app] ?? 0) * 0.3 + (queues[app] ?? 0) * 0.5) * 100) / 100,
+        }));
+        const totalVeh = live.total ?? 0;
+        return {
+          id: j.id,
+          name: j.name,
+          phase: j.phase ?? 'GREEN_NS',
+          phaseRemainingSec: 25,
+          greenSec: 35,
+          yellowSec: 3,
+          allRedSec: 2,
+          approaches,
+          totalVehicles: totalVeh,
+          congestion: totalVeh > 15 ? 'high' : totalVeh > 5 ? 'moderate' : 'low',
+        } as Junction;
+      });
+    }
+    return raw as Junction[];
+  },
   junction: (id: string) => req<Junction>(`/api/junctions/${id}`),
-  events: (params = '') => req<AppEvent[]>(`/api/events${params}`),
+  events: async (params = '') => {
+    const raw = await req<any[]>(`/api/events${params}`);
+    if (Array.isArray(raw)) {
+      return raw.map((e) => ({
+        id: e.id,
+        timestamp: e.created_at ?? e.timestamp ?? new Date().toISOString(),
+        type: e.type,
+        junctionId: e.junction_id ?? e.junctionId,
+        source: e.source ?? 'system',
+        message: e.message,
+        severity: (e.type?.includes('EMERGENCY') || e.type?.includes('ALL_RED') ? 'critical' : e.type?.includes('YELLOW') ? 'warning' : 'info') as any,
+      } as AppEvent));
+    }
+    return raw as AppEvent[];
+  },
   analyticsSummary: () => req<{ meanWaitSec: number; throughput: number; congestionHistory: { time: string; level: number }[] }>('/api/analytics/summary'),
   experiments: () => req<ExperimentRun[]>('/api/analytics/experiments'),
-  emergencies: () => req<Emergency[]>('/api/emergencies'),
+  emergencies: async () => {
+    const raw = await req<any[]>('/api/emergencies');
+    if (Array.isArray(raw)) {
+      return raw.map((em) => {
+        const routeArr = Array.isArray(em.route) ? em.route : typeof em.route === 'string' ? em.route.split(',') : ['J1', 'J2', 'J4'];
+        return {
+          id: String(em.id),
+          ambulanceId: em.ambulance_id ?? em.ambulanceId ?? 'AMB-01',
+          fromJunction: em.current_junction ?? em.fromJunction ?? 'J1',
+          toJunction: em.destination_junction ?? em.toJunction ?? 'J4',
+          route: routeArr,
+          status: (em.status?.toLowerCase() as any) ?? 'requested',
+          etaSec: Math.round(em.eta_s ?? em.etaSec ?? 30),
+          progressPct: Math.round((em.progress ?? 0) * 100),
+          currentJunction: em.current_junction ?? 'J1',
+          nextJunction: em.next_junction ?? routeArr[1] ?? 'J2',
+          speedKmh: em.speed_kmh ?? 45,
+        } as Emergency;
+      });
+    }
+    return raw as Emergency[];
+  },
   // Backend EmergencyCreateRequest uses snake_case: ambulance_id,
   // current_junction, destination_junction. Location uses x/y/speed_kmh.
   createEmergency: (body: { ambulanceId: string; fromJunction: string; toJunction: string; route: string[] }) =>

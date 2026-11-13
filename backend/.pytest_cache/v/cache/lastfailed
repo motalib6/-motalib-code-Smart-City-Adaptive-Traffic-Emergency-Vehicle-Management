@@ -1,1 +1,4 @@
-{}
+{
+  "tests/test_api.py::test_health_no_auth": true,
+  "tests/test_api.py::test_sumo_start_blocked_with_clear_reason": true
+}

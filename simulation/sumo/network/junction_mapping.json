@@ -1,0 +1,155 @@
+{
+  "description": "Mapping between SMARTFLOW application junction labels and actual SUMO network junction / traffic light IDs",
+  "generated_at": "2026-11-12T13:30:00+05:30",
+  "network_file": "simulation/sumo/network/smartflow.net.xml",
+  "junctions": {
+    "J1": {
+      "app_label": "Rasulgarh",
+      "sumo_junction_id": "A0",
+      "sumo_tls_id": "A0",
+      "type": "traffic_light",
+      "coordinates": {
+        "x": 150.0,
+        "y": 150.0
+      },
+      "grid_position": "bottom-left",
+      "incoming_edges": [
+        "A1A0",
+        "B0A0",
+        "bottom0A0",
+        "left0A0"
+      ],
+      "outgoing_edges": [
+        "A0A1",
+        "A0B0",
+        "A0bottom0",
+        "A0left0"
+      ]
+    },
+    "J2": {
+      "app_label": "Vani Vihar",
+      "sumo_junction_id": "A1",
+      "sumo_tls_id": "A1",
+      "type": "traffic_light",
+      "coordinates": {
+        "x": 150.0,
+        "y": 450.0
+      },
+      "grid_position": "top-left",
+      "incoming_edges": [
+        "A0A1",
+        "B1A1",
+        "left1A1",
+        "top0A1"
+      ],
+      "outgoing_edges": [
+        "A1A0",
+        "A1B1",
+        "A1left1",
+        "A1top0"
+      ]
+    },
+    "J3": {
+      "app_label": "Master Canteen",
+      "sumo_junction_id": "B0",
+      "sumo_tls_id": "B0",
+      "type": "traffic_light",
+      "coordinates": {
+        "x": 450.0,
+        "y": 150.0
+      },
+      "grid_position": "bottom-right",
+      "incoming_edges": [
+        "A0B0",
+        "B1B0",
+        "bottom1B0",
+        "right0B0"
+      ],
+      "outgoing_edges": [
+        "B0A0",
+        "B0B1",
+        "B0bottom1",
+        "B0right0"
+      ]
+    },
+    "J4": {
+      "app_label": "Khandagiri",
+      "sumo_junction_id": "B1",
+      "sumo_tls_id": "B1",
+      "type": "traffic_light",
+      "coordinates": {
+        "x": 450.0,
+        "y": 450.0
+      },
+      "grid_position": "top-right",
+      "incoming_edges": [
+        "A1B1",
+        "B0B1",
+        "right1B1",
+        "top1B1"
+      ],
+      "outgoing_edges": [
+        "B1A1",
+        "B1B0",
+        "B1right1",
+        "B1top1"
+      ]
+    }
+  },
+  "sumo_to_app": {
+    "A0": "J1",
+    "A1": "J2",
+    "B0": "J3",
+    "B1": "J4"
+  },
+  "boundary_nodes": [
+    {
+      "id": "bottom0",
+      "x": 150.0,
+      "y": 0.0,
+      "type": "priority"
+    },
+    {
+      "id": "bottom1",
+      "x": 450.0,
+      "y": 0.0,
+      "type": "priority"
+    },
+    {
+      "id": "left0",
+      "x": 0.0,
+      "y": 150.0,
+      "type": "priority"
+    },
+    {
+      "id": "left1",
+      "x": 0.0,
+      "y": 450.0,
+      "type": "priority"
+    },
+    {
+      "id": "right0",
+      "x": 600.0,
+      "y": 150.0,
+      "type": "priority"
+    },
+    {
+      "id": "right1",
+      "x": 600.0,
+      "y": 450.0,
+      "type": "priority"
+    },
+    {
+      "id": "top0",
+      "x": 150.0,
+      "y": 600.0,
+      "type": "priority"
+    },
+    {
+      "id": "top1",
+      "x": 450.0,
+      "y": 600.0,
+      "type": "priority"
+    }
+  ]
+}

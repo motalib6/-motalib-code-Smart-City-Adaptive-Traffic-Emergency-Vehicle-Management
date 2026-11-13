@@ -12,11 +12,17 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=8)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str
     email: str
+    user: Optional[dict[str, Any]] = None
 
 
 class UserOut(BaseModel):

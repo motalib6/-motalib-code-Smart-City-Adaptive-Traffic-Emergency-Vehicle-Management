@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
 from app.core.permissions import get_current_user
-from app.core.security import create_access_token, verify_password
+from app.core.security import create_access_token, hash_password, verify_password
 from app.database import get_session
 from app.models import User
-from app.schemas import LoginRequest, TokenResponse, UserOut
+from app.schemas import ChangePasswordRequest, LoginRequest, TokenResponse, UserOut
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -23,7 +23,18 @@ def login(body: LoginRequest, session: Session = Depends(get_session)):
     return TokenResponse(
         access_token=create_access_token(user.email, user.role),
         role=user.role, email=user.email,
+        user={"id": user.id, "username": user.email, "role": user.role.lower()}
     )
+
+
+@router.post("/change-password")
+def change_password(body: ChangePasswordRequest, user: User = Depends(get_current_user), session: Session = Depends(get_session)):
+    if not verify_password(body.old_password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password incorrect")
+    user.password_hash = hash_password(body.new_password)
+    session.add(user)
+    session.commit()
+    return {"status": "password_updated"}
 
 
 @router.get("/me", response_model=UserOut)
